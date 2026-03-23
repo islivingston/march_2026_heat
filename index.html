@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Record Highs for March Set Since March 15, 2026</title>
+<title>Record Highs for March Set Since March 16, 2026</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -99,7 +99,7 @@
 </head>
 <body>
 <div id="header">
-  <h1>Record Highs for March Set Since March 15, 2026</h1>
+  <h1>Record Highs for March Set Since March 16, 2026</h1>
   <span class="count" id="station-count">0 stations</span>
 </div>
 <div id="sidebar">
@@ -113,7 +113,6 @@
   <div class="section">
     <h3>Record Date</h3>
     <select id="date-select" onchange="applyFilters()"><option value="all" selected>All Dates</option>
-<option value="2026-03-15">Mar 15</option>
 <option value="2026-03-16">Mar 16</option>
 <option value="2026-03-17">Mar 17</option>
 <option value="2026-03-18">Mar 18</option>
@@ -211,7 +210,7 @@ function passesBaseFilters(s) {
   var dateVal = document.getElementById('date-select').value;
   var minPor = parseInt(document.getElementById('por-slider').value) || 1;
   if (s.record_year !== '2026') return false;
-  if (s.record_date < '2026-03-15') return false;
+  if (s.record_date < '2026-03-16') return false;
   if (dateVal !== 'all' && s.record_date !== dateVal) return false;
   if (s.por_years < minPor) return false;
   return true;
