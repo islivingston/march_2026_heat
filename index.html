@@ -10,16 +10,30 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f5f5f5; }
   #header {
-    background: #1d1d1d; color: #f1faee; padding: 10px 20px;
+    background: #1d1d1d; color: #f1faee; padding: 10px 16px;
     display: flex; align-items: center; justify-content: space-between;
+    position: relative; z-index: 1100;
   }
-  #header h1 { font-size: 16px; font-weight: 600; }
+  #header h1 { font-size: 15px; font-weight: 600; }
   #header .count { font-size: 13px; color: #a8dadc; }
+  #toggle-btn {
+    background: #333; color: #f1faee; border: none;
+    padding: 6px 12px; border-radius: 4px; cursor: pointer;
+    font-size: 13px; font-weight: 600; margin-right: 8px;
+  }
+  #toggle-btn:hover { background: #555; }
+  .header-right {
+    display: flex; align-items: center; gap: 10px;
+  }
   #sidebar {
     position: absolute; top: 48px; left: 0; width: 260px;
     height: calc(100vh - 48px); background: #fff;
     border-right: 1px solid #ddd; z-index: 1000;
     overflow-y: auto; padding: 16px; font-size: 13px;
+    transition: transform 0.25s ease;
+  }
+  #sidebar.collapsed {
+    transform: translateX(-260px);
   }
   #sidebar h3 {
     font-size: 11px; text-transform: uppercase;
@@ -90,17 +104,47 @@
   #map {
     position: absolute; top: 48px; left: 260px;
     width: calc(100% - 260px); height: calc(100vh - 48px);
+    transition: left 0.25s ease, width 0.25s ease;
+  }
+  #map.expanded {
+    left: 0; width: 100%;
   }
   .leaflet-popup-content-wrapper {
     border-radius: 6px; font-family: 'Consolas', monospace; font-size: 12px;
   }
   .leaflet-popup-content b { font-size: 13px; color: #1d1d1d; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    #header h1 { font-size: 13px; }
+    #sidebar {
+      width: 100%; height: auto; max-height: 60vh;
+      position: absolute; top: 48px; left: 0;
+      border-right: none; border-bottom: 1px solid #ddd;
+      transform: translateY(0);
+    }
+    #sidebar.collapsed {
+      transform: translateY(-100%);
+    }
+    #map {
+      left: 0; width: 100%; top: 48px; height: calc(100vh - 48px);
+    }
+    #map.expanded {
+      left: 0; width: 100%;
+    }
+  }
 </style>
 </head>
 <body>
 <div id="header">
-  <h1>Record Highs for March Set Since March 16, 2026</h1>
-  <span class="count" id="station-count">0 stations</span>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button id="toggle-btn" onclick="toggleSidebar()">Filters</button>
+    <h1>Record Highs for March Set Since March 16, 2026</h1>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span style="font-size:11px;color:#888;">Data: <a href="https://www.rcc-acis.org/" target="_blank" style="color:#a8dadc;">RCC-ACIS</a></span>
+    <span class="count" id="station-count">0 stations</span>
+  </div>
 </div>
 <div id="sidebar">
   <div class="section">
@@ -171,6 +215,27 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png', {
 }).addTo(map);
 var markersLayer = L.layerGroup().addTo(map);
 var displayMode = 'dots';
+var sidebarOpen = true;
+
+function toggleSidebar() {
+  var sidebar = document.getElementById('sidebar');
+  var mapEl = document.getElementById('map');
+  sidebarOpen = !sidebarOpen;
+  if (sidebarOpen) {
+    sidebar.classList.remove('collapsed');
+    mapEl.classList.remove('expanded');
+  } else {
+    sidebar.classList.add('collapsed');
+    mapEl.classList.add('expanded');
+  }
+  // Tell Leaflet to recalculate map size after transition
+  setTimeout(function() { map.invalidateSize(); }, 300);
+}
+
+// Auto-collapse sidebar on mobile
+if (window.innerWidth <= 768) {
+  toggleSidebar();
+}
 
 function setDisplayMode(mode) {
   displayMode = mode;
